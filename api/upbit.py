@@ -23,7 +23,7 @@ class Upbit():
 
 
   def getCoins(self):
-    return self.marketByCoin.keys()
+    return list(self.marketByCoin.keys())
 
 
 if __name__ == '__main__':

@@ -1,18 +1,13 @@
-from PyQt5.QtWidgets import QWidget, QCheckBox, QGroupBox, QVBoxLayout
-from configparser import ConfigParser
+from PyQt5.QtWidgets import QWidget, QCheckBox, QGroupBox, QVBoxLayout, QGridLayout
 from api import binance, upbit
-
-# parser = ConfigParser()
-# parser.read('../conf.ini')
-# exchanges = parser.options('exchange')
 
 class ExchangeCoinSelectGroup(QWidget):
     def __init__(self):
         super().__init__()
 
         self.EXCHANGE_INSTANCE = {
-            "binance": binance.Binance,
-            "upbit": upbit.Upbit
+            "binance": binance.Binance(),
+            "upbit": upbit.Upbit()
         }
 
     def generate_exchange_group(self):
@@ -45,8 +40,12 @@ class ExchangeCoinSelectGroup(QWidget):
 
     def change_exchange_state(self, state, origin: str):
         boolean = False if state == 0 else True
-
         print("Checkbox exchange {} has changed: {}".format(origin, boolean))
+
+        print(self.EXCHANGE_INSTANCE[origin].getCoins())
+        a = self.generate_coin_group(['BAAA'])
+        a.update()
+
 
 
     def change_coin_state(self, state, origin: str):

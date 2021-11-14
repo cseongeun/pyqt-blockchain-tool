@@ -18,6 +18,9 @@ class Binance():
 
     return self.marketByCoin
 
+  def getCoins(self):
+    return list(self.marketByCoin.keys())
+
 if __name__ == '__main__':
   app = Binance()
   ex = app.getMarkets()
