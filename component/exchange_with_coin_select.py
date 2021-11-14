@@ -39,23 +39,26 @@ class MyApp(QWidget):
         groupbox.setLayout(vbox)
         return groupbox
 
-    def change_exchange_state(self, state, origin: str):  # + state
-        print("Checkbox {} has changed: {}".format(origin, False if state == 0 else True ))
 
-    def generate_coin_group(self):
+    def generate_coin_group(self, coins=['BTC', 'ETH']):
         groupbox = QGroupBox('coin')
         vbox = QVBoxLayout()
 
-        for index, exchange in enumerate(exchanges):
-            cb = QCheckBox(exchange, self)
+        for index, coin in enumerate(coins):
+            cb = QCheckBox(coin, self)
             cb.move(20, 20* index)
             cb.toggle()
-            cb.stateChanged.connect(lambda state, checkbox=exchange: self.change_exchange_state(state, checkbox) )
+            cb.stateChanged.connect(lambda state, checkbox=coin: self.change_coin_state(state, checkbox) )
             vbox.addWidget(cb)
 
         groupbox.setLayout(vbox)
         return groupbox
 
+    def change_exchange_state(self, state, origin: str):  # + state
+        print("Checkbox {} has changed: {}".format(origin, False if state == 0 else True ))
+
+    def change_coin_state(self, state, origin: str):  # + state
+        print("Checkbox {} has changed: {}".format(origin, False if state == 0 else True ))
 
 
 if __name__ == '__main__':
