@@ -11,11 +11,11 @@ class ExchangeCoinPrice(QWidget):
    def init_ui(self):
         grid = QGridLayout()
         grid.addWidget(ExchangeCoinSelectGroup().generate_exchange_group(), 0, 0)
+        grid.addWidget(ExchangeCoinSelectGroup().generate_coin_group(), 1, 0)
 
         self.setLayout(grid)
         self.setWindowTitle('Exchange Coin-Price')
-        self.move(300, 300)
-        self.resize(400, 200)
+        self.setGeometry(300, 300, 480, 320)
         self.show()
 
 
