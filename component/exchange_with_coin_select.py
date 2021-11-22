@@ -1,5 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QCheckBox, QGroupBox, QVBoxLayout, QGridLayout
+from PyQt5.QtWidgets import (QApplication, QWidget, QGroupBox, QRadioButton
+, QCheckBox, QPushButton, QMenu, QGridLayout, QVBoxLayout, QHBoxLayout)
 from api import binance, upbit
+
+import sys
+
 
 class ExchangeCoinSelectGroup(QWidget):
     def __init__(self):
@@ -8,73 +12,95 @@ class ExchangeCoinSelectGroup(QWidget):
         self.EXCHANGES = {
             "binance": {
                 "instance": binance.Binance(),
-                "checked": False,
+                "checked": True,
             },
             "upbit": {
                 "instance": upbit.Upbit(),
-                "checked": False,
+                "checked": True,
             },
         }
 
-
         self.coins = []
 
+        self.exchangeGroupBox = QGroupBox('exchange')
+        self.coinGroupBox = QGroupBox('coin')
+
+        self.exchangeVBox = QHBoxLayout()
+        self.coinVBox = QHBoxLayout()
+
+        self.exchangeVBox.setContentsMargins(0, 0, 0, 0)
+        self.exchangeVBox.setSpacing(20)
+
+        self.coinVBox.setContentsMargins(0, 0, 0, 0)
+        self.coinVBox.setSpacing(20)
+
+        self.generate_exchange_group()
+        self.generate_coin_group()
+
+        self.grid = QGridLayout()
+
+        self.grid.addWidget(self.exchangeGroupBox, 0, 0)
+        self.grid.addWidget(self.coinGroupBox, 1, 0)
+
+        self.setLayout(self.grid)
+        self.setWindowTitle('Exchange Coin-Price')
+        self.setGeometry(1000, 1000, 1000, 1000)
+        self.show()
+
+    def get_exchange_group_box(self):
+        return self.exchangeGroupBox
+
+    def get_coin_group_box(self):
+        return self.coinGroupBox
 
     def generate_exchange_group(self):
-        groupbox = QGroupBox('exchange')
-        vbox = QVBoxLayout()
 
         for index, exchange in enumerate(list(self.EXCHANGES.keys())):
             cb = QCheckBox(exchange, self)
             cb.move(20, 20 * index)
             cb.toggle()
             cb.stateChanged.connect(lambda state, checkbox=exchange: self.change_exchange_state(state, checkbox))
-            vbox.addWidget(cb)
+            self.exchangeVBox.addWidget(cb)
 
-        groupbox.setLayout(vbox)
-        return groupbox
+        self.exchangeGroupBox.setLayout(self.exchangeVBox)
 
     def generate_coin_group(self):
-        groupbox = QGroupBox('coin')
-        vbox = QVBoxLayout()
-
-        for index, coin in enumerate(self.coins):
+         for index, coin in enumerate(self.coins):
             cb = QCheckBox(coin, self)
             cb.move(20, 20 * index)
             cb.toggle()
-            cb.stateChanged.connect(lambda state, checkbox=coin: self.change_coin_state(state, checkbox) )
-            vbox.addWidget(cb)
+            cb.stateChanged.connect(lambda state, checkbox=coin: self.change_coin_state(state, checkbox))
+            self.coinVBox.addWidget(cb)
 
-        groupbox.setLayout(vbox)
-        return groupbox
+         self.coinGroupBox.setLayout(self.coinVBox)
 
     def change_exchange_state(self, state, origin: str):
         boolean = False if state == 0 else True
+
         print("Checkbox exchange {} has changed: {}".format(origin, boolean))
+
         self.EXCHANGES[origin]['checked'] = boolean
 
         self.coins = []
+        exchange_coins = []
+
         for exchange in self.EXCHANGES:
             checked = self.EXCHANGES[exchange]['checked']
-            print(checked)
             if checked:
-                self.coins.append(self.EXCHANGES[exchange]['instance'].getCoins())
+                exchange_coins.append(self.EXCHANGES[exchange]['instance'].getCoins())
 
-        return self.coins
-
-
-
-        # selected_exchange_coin = self.EXCHANGE_INSTANCE[origin].getCoins()
-        # self.coins = self.coins.append(selected_exchange_coin)
-        # print(self.coins)
+        self.coins = sum(exchange_coins, []) # flat
+        self.generate_coin_group()
+        self.exchangeGroupBox.update()
 
     def change_coin_state(self, state, origin: str):
         boolean = False if state == 0 else True
 
         print("Checkbox coin {} has changed: {}".format(origin, boolean))
 
-#
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     ex = ExchangeCoinSelectGroup()
-#     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+   app = QApplication(sys.argv)
+   ex = ExchangeCoinSelectGroup()
+   sys.exit(app.exec_())
